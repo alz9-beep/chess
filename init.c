@@ -38,11 +38,11 @@ link *create_link(int pos){
 }
 
 void free_link(link *head){
-    link *next;
-    for(link *ptr = head; ptr != NULL; ptr = ptr->next){
-        next = ptr->next;
+    link *n, *ptr = head;
+    while(ptr != NULL){
+        n = ptr->next;
         free(ptr); 
-        ptr = next;
+        ptr = n;
     }
 }
 
@@ -53,7 +53,7 @@ void print_moves(link **arr, int dirs){
 }
 
 void print_links(link *head){
-    if (head == NULL) return;
+    if (head == NULL){ printf("NULL");return;}
     link *p = head;
     for(; p->next != NULL; p = p->next){
         printf("%d ->", p->pos);
@@ -120,12 +120,13 @@ int get_position(board *b, piece_c color, piece_t type, int n){
 #define UL_off 7
 #define UP_off 8
 #define UR_off 9
-
+#define FIRST_COL 0
+#define LAST_COL 7 
 link *pawn_move_range(board *b, piece_c color, int pos, int dir){
     
-    uint64_t enemy_mask = colorMask(b, ~color); 
+    uint64_t enemy_mask = colorMask(b, !color); 
     uint64_t ally_mask = colorMask(b, color); 
-
+    
     int color_off= 1;
  
     if(color == BLACK){
@@ -134,14 +135,23 @@ link *pawn_move_range(board *b, piece_c color, int pos, int dir){
     int data;
     link *head = NULL;
     
+    
     switch(dir){
         case UL:
+            if (pos % DIM == FIRST_COL)
+                return head;
+
             if (enemy_mask >> (data = (pos + UL_off * color_off)) & 1){
                 head = create_link(data);
                 return head;
             }
+            else{
+            }
             break;
         case UR:
+            if (pos % DIM == LAST_COL) 
+                return head;
+
             if (enemy_mask >> (data = (pos + UR_off * color_off)) & 1){
                 head = create_link(data);
                 return head;
@@ -158,10 +168,10 @@ link *pawn_move_range(board *b, piece_c color, int pos, int dir){
             int first_move = 0;
             switch(color){
                 case WHITE:
-                    if(pos / 8 == 1) first_move = 1;
+                    if(pos / DIM == 1) first_move = 1;
                     break;
                 case BLACK:
-                    if(pos / 8 == 6) first_move = 1;
+                    if(pos / DIM == 6) first_move = 1;
                     break;
             }
             if (first_move){
@@ -174,6 +184,20 @@ link *pawn_move_range(board *b, piece_c color, int pos, int dir){
     }
     return head;
 }
+link *knight_move_range(board *, piece_c, int, int){
+    
+}
+#define 
+link *bishop_move_range(board *, piece_c, int, int){
+    
+    uint64_t enemy_mask = colorMask(b, !color); 
+    uint64_t ally_mask = colorMask(b, color); 
+    
+
+
+}
+link *rook_move_range(board *, piece_c, int, int);
+
 #define PAWN_DIRS 3
 void find_pawn_moves(board *b, piece_c color){
     int pos, n = 1;
@@ -197,11 +221,55 @@ void find_rook_moves(board *, piece_c);
 void find_queen_moves(board *, piece_c);
 void find_king_moves(board *, piece_c);
 
+piece_t piece_in_pos(uint64_t *p, int pos){ //takes b->white/black arr as argument
+    for(piece_t i = PAWN; i <= KING; i++){
+        if((*(p + i)) >> pos & 1){
+            return i;
+        }
+    }
+    return -1;
+}
+void clear_pos(uint64_t *a, int pos){ //mask and position
+    uint64_t clear_mask = ~(1 << pos);
+    *a &= clear_mask;
+}
+void update_pos(uint64_t *a, int pos){
+    uint64_t update_mask = (1 << pos);
+    *a |= update_mask;
+}
 
+int move(board *b, piece_c color, piece_t type, int pos_o, int pos_n){
+    
+    uint64_t *ally, *enemy;
+    
+    switch(color){
+        case WHITE:
+            ally = b->white;
+            enemy = b->black;
+            break;
+        case BLACK:
+            ally = b->black;
+            enemy = b->white;
+            break;
+    }
+
+    clear_pos(ally + type, pos_o);
+    update_pos(ally + type, pos_n);
+
+    piece_t pieceType;
+
+    if((pieceType = piece_in_pos(enemy, pos_n)) != -1){
+        clear_pos(enemy + pieceType, pos_n);
+        return 1;
+    }
+
+    return 0;
+    
+}
 
 int main(){
     
-    board *b = create_board();
+    /*board *b = create_board();
     init_board_def(b);
 
     piece_c c = WHITE;
@@ -209,7 +277,16 @@ int main(){
     find_pawn_moves(b, c);
 
 
-    free_board(b);
+    free_board(b);*/
+
+    uint64_t *test;
+    *test = 0xFF00;
+
+    clear_pos(test, 8);
+    printf("test = %" PRIx64 "\n", *test);
+    
+    update_pos(test, 8);
+    printf("test = %" PRIx64 "\n", *test);
 
     return 0;
 }
