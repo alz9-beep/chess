@@ -55,10 +55,16 @@ void print_moves(link **arr, int dirs){
 void print_links(link *head){
     if (head == NULL){ printf("NULL");return;}
     link *p = head;
-    for(; p->next != NULL; p = p->next){
-        printf("%d ->", p->pos);
+    for(; p != NULL; p = p->next){
+        printf(" -> ");
+        pos_to_char( p->pos);
     }
-    printf("%d\n", p->pos);
+    pos_to_char( p->pos);
+    printf("\n");
+}
+
+void pos_to_char(int pos){
+    printf("%c%d", file[pos % DIM], pos / 8+ 1);
 }
 
 uint64_t colorMask(board * b, piece_c color){
@@ -132,94 +138,50 @@ link *pawn_move_range(board *b, piece_c color, int pos, int dir){
     if(color == BLACK){
         color_off= -1;
     }
-    int data;
-    link *head = NULL;
     
-    
-    switch(dir){
-        case UL:
-            if (pos % DIM == FIRST_COL)
-                return head;
-
-            if (enemy_mask >> (data = (pos + UL_off * color_off)) & 1){
-                head = create_link(data);
-                return head;
-            }
-            else{
-            }
-            break;
-        case UR:
-            if (pos % DIM == LAST_COL) 
-                return head;
-
-            if (enemy_mask >> (data = (pos + UR_off * color_off)) & 1){
-                head = create_link(data);
-                return head;
-            }
-            break;
-        case UP:
-            if (ally_mask >> (data = (pos + UP_off * color_off)) & 1 ){
-                return head;
-            }
-            else {
-                head = create_link(data);
-            }
-            
-            int first_move = 0;
-            switch(color){
-                case WHITE:
-                    if(pos / DIM == 1) first_move = 1;
-                    break;
-                case BLACK:
-                    if(pos / DIM == 6) first_move = 1;
-                    break;
-            }
-            if (first_move){
-                if(ally_mask >> (data = (pos + 2 * (UP_off * color_off))) & 1){
-                    return head;
-                }
-                head->next = create_link(data);
-            }
-            break;
-    }
-    return head;
+    return;
 }
-link *knight_move_range(board *, piece_c, int, int){
     
+link *knight_move_range(board * b, piece_c color, int pos, int dir){
 }
-#define 
-link *bishop_move_range(board *, piece_c, int, int){
+
+#define N 8
+#define E 1
+#define S -8
+#define W -1
+
+
+    
+link *bishop_move_range(board * b, piece_c color, int pos, int dir){
     
     uint64_t enemy_mask = colorMask(b, !color); 
     uint64_t ally_mask = colorMask(b, color); 
+
     
-
-
+    
+    
+    
+    return ;
 }
+link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir){
+    
+    link *curr, *prev, *head = NULL;
+    int square;
+    bool first = true;
+
+
+    create_link(square);
+
+        
+    
+    return head;
+}
+
+
+
 link *rook_move_range(board *, piece_c, int, int);
 
 #define PAWN_DIRS 3
-void find_pawn_moves(board *b, piece_c color){
-    int pos, n = 1;
-    while((pos = get_position(b, color, PAWN, n++)) != MISSING){
-        link *moves[PAWN_DIRS];
-        for(int i = UL; i <= UR; i++){
-            moves[i] = pawn_move_range(b, color, pos, i); 
-        }
-        printf("start pos: %d ... ", pos);
-        print_moves(moves, PAWN_DIRS);
-        for(int j = UL; j <= UR; j++){
-            free_link(moves[j]);
-        }
-
-    }
-}
-
-void find_knight_moves(board *, piece_c);
-void find_bishop_moves(board *, piece_c);
-void find_rook_moves(board *, piece_c);
-void find_queen_moves(board *, piece_c);
-void find_king_moves(board *, piece_c);
 
 piece_t piece_in_pos(uint64_t *p, int pos){ //takes b->white/black arr as argument
     for(piece_t i = PAWN; i <= KING; i++){
