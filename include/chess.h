@@ -18,7 +18,9 @@
 #define SE -7
 #define MSB 0x8000000000000000
 #define LSB 1
+#define PAWN_DIRS 3
 #define PIECE_DIRS 4
+#define SPEC_DIRS 8
 
 // Enums and Structs
 typedef enum { WHITE, BLACK } piece_c;
@@ -51,6 +53,7 @@ link **create_moveList(int num_dirs);
 void free_link(link *head);
 void free_moveList(link **arr, int num_dirs);
 link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max);
+link **pawn_move_range(board *b, piece_c color, int pos);
 link **rook_move_range(board *b, piece_c color, int pos);
 link **bishop_move_range(board *b, piece_c color, int pos);
 int get_position(board *b, piece_c color, piece_t type, int n);

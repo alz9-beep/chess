@@ -44,12 +44,14 @@ link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max){
             bit_check = MSB;
     }
 
+
     uint64_t *ally = &ally_mask, *enemy = &enemy_mask;
     
     m_shift(ally, pos, direction); //align to current piece
     m_shift(enemy, pos, direction); 
 
     int i;
+
     
    for(i = 0; i < max; i++){
         
@@ -64,10 +66,7 @@ link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max){
        
        pos += dir;
 
-       if(ally_mask & bit_check){ 
-           //printf("ally blocking\n");
-           return head; 
-       }
+       
 
        if(enemy_mask & bit_check && i){
            curr = create_link(pos);
@@ -78,6 +77,9 @@ link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max){
            head = create_link(pos);
            //printf("enemy piece in square\n");
            return head;
+       } else if(ally_mask & bit_check){ 
+           //printf("ally blocking\n");
+           return head; 
        }
        
        if(i){
@@ -97,14 +99,29 @@ link **pawn_move_range(board *b, piece_c color, int pos){
     
     uint64_t enemy_mask = colorMask(b, !color); 
     uint64_t ally_mask = colorMask(b, color); 
-    
-    int color_off= 1;
- 
-    if(color == BLACK){
-        color_off= -1;
+
+    int forward, captureLeft, captureRight;
+
+    switch(color){
+        case WHITE:
+            forward = N;
+            captureLeft = NW;
+            captureRight = NE;
+            break;
+        default:
+            forward = S;
+            captureLeft = SE;
+            captureRight = SW;
+    }
+    int directions[PAWN_DIRS] = { forward, captureLeft, captureRight };
+
+    link **movelist = create_moveList(PAWN_DIRS);
+
+    for(int i = 0; i < PAWN_DIRS; i++){
+        movelist[i] = range(ally_mask, enemy_mask, pos, directions[i], 2);
     }
     
-    return NULL;
+    return movelist;
 }
     
 link **knight_move_range(board * b, piece_c color, int pos){

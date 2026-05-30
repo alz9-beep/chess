@@ -14,7 +14,7 @@ void free_board(board *b){
 
 void init_board_def(board *b){
     
-    b->white[PAWN] = 0x0000000000000000;
+    b->white[PAWN] = 0x000000000000FF00;
 
     b->black[PAWN] = 0x00FF000000000000;
 
