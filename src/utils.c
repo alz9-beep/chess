@@ -2,13 +2,14 @@
 
 char file_c[8] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 
-void m_shift(uint64_t *mask, int pos, shift_dir dir){
+uint64_t m_shift(uint64_t mask, int pos, shift_dir dir){
+	if(pos < 0){ pos *= -1; }
     switch(dir){
         case LEFT:
-            *mask <<= pos;
+            return mask << pos;
             break;
-        case RIGHT:
-            *mask >>= pos;
+        default:
+            return mask >> pos;
             break;
     }
 }

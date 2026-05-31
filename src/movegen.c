@@ -1,5 +1,10 @@
 #include "../include/chess.h"
 
+
+void printuint64(uint64_t n){
+	printf("%" PRIx64 "\n", n);
+}
+
 link *create_link(int pos){
     link *ret = (link *)malloc(sizeof(link));
     ret->pos = pos;
@@ -29,6 +34,7 @@ void free_moveList(link **arr, int num_dirs){
 }
 
 link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max){
+
     
     link *curr, *prev, *head = NULL;
 
@@ -45,25 +51,34 @@ link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max){
             bit_check = MSB;
     }
 
+	printf("ally before alignment"); printuint64(ally_mask);
+	printf("enemy before alignment"); printuint64(enemy_mask);
 
-    uint64_t *ally = &ally_mask, *enemy = &enemy_mask;
+
     
-    m_shift(ally, pos, direction); //align to current piece
-    m_shift(enemy, pos, direction); 
+    ally_mask = m_shift(ally_mask, pos, direction); 
+    enemy_mask = m_shift(enemy_mask, pos, direction); 
 
-    int i;
+
+	printf("ally:"); printuint64(ally_mask); printf("dir: %d\n",dir);
+	printf("enemy:"); printuint64(enemy_mask);
+    
+	int i;
 
     
    for(i = 0; i < max; i++){
-        
-       m_shift(ally, dir, direction); 
-       m_shift(enemy, dir, direction); 
 
 
        if (!in_bounds(pos, dir)){
            //printf("out of bounds\n");
            return head; 
        }
+    	
+	ally_mask = m_shift(ally_mask, dir, direction); 
+    	enemy_mask = m_shift(enemy_mask, dir, direction); 
+        
+	printf("ally post shift:"); printuint64(ally_mask);
+	printf("enemy post shift:"); printuint64(enemy_mask);
        
        pos += dir;
 
@@ -72,15 +87,16 @@ link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max){
        if(enemy_mask & bit_check && i){
            curr = create_link(pos);
            prev->next = curr;
-           //printf("enemy piece, capture and end\n");
+           printf("enemy piece, capture and end\n");
            return head;
        } else if(enemy_mask & bit_check){
            head = create_link(pos);
-           //printf("enemy piece in square\n");
+           printf("enemy piece in square\n");
            return head;
        } else if(ally_mask & bit_check){ 
-           //printf("ally blocking\n");
+           printf("ally blocking\n");
            return head; 
+       } else{
        }
        
        if(i){
@@ -114,6 +130,7 @@ link **pawn_move_range(board *b, piece_c color, int pos){
             captureLeft = SE;
             captureRight = SW;
     }
+
     int directions[PAWN_DIRS] = { forward, captureLeft, captureRight };
 
     link **movelist = create_moveList(PAWN_DIRS);
@@ -172,6 +189,24 @@ link **rook_move_range(board *b, piece_c color, int pos){
 
 }
 
+link **queen_move_range(board *b, piece_c color, int pos){
+    
+
+    uint64_t enemy_mask = colorMask(b, !color); 
+    uint64_t ally_mask = colorMask(b, color);
+    
+    int directions[SPEC_DIRS] = { N, E, S, W, NE, NW, SE, SW };
+
+    link **movelist = create_moveList(SPEC_DIRS);
+
+    for(int i = 0; i < SPEC_DIRS; i++){
+       movelist[i] = range(ally_mask, enemy_mask, pos, directions[i], DIM);
+    }
+
+    return movelist;
+    
+}
+
 #define MISSING -1
 
 int get_position(board *b, piece_c color, piece_t type, int n){
@@ -209,11 +244,9 @@ void trim_pawn_moves(link **moves, int pos, uint64_t enemy, int dir){
     shift_dir sdir = (dir > 0) ? RIGHT: LEFT; 
     uint64_t bit_check = (dir > 0) ? LSB: MSB;
 
-    uint64_t enemy_mask = enemy;
-    
-    m_shift (&enemy_mask, pos + dir, sdir);
+    enemy = m_shift(enemy, pos + dir, sdir);
 
-    if(!(enemy_mask & bit_check)){
+    if(!(enemy & bit_check)){
         free_link(*moves);
         *moves = NULL;
     }

@@ -5,22 +5,23 @@ int main(){
     board *b = create_board();
     init_board_def(b);
 
-    print_board(b);
+    //print_board(b);
 
     piece_c c = WHITE;
-    piece_t t = PAWN;
+    piece_t t = QUEEN;
     
     int pos_1 = get_position(b,c,t, 1);   
     int pos_2 = get_position(b, c, t, 2);
     printf("white : pos_1: %d, pos_2: %d\n", pos_1, pos_2);
 
-    int pos_3 = get_position(b, !c, t, 1);
-    int pos_4,
+    //int pos_3 = get_position(b, !c, t, 1);
+    //int pos_4 = get_position(b, !c, t, 2);
+    //printf("black : pos 1: %d, pos 2: %d\n", pos_3, pos_4);
     
     //if(move(b, c, t, pos_1, 48)){printf("piece taken\n");} else{printf("no piece there\n");}
 
     
-    link **moveList = pawn_move_range(b, c, pos_2);
+    link **moveList = queen_move_range(b, c, pos_1);
 
     /*pos_1 = get_position(b,c,t, 1);   
     pos_2 = get_position(b, c, t, 2);
@@ -28,17 +29,17 @@ int main(){
     printf(" pos_1: %d, pos_2: %d\n", pos_1, pos_2);*/
     
 
-    print_moves(moveList, PAWN_DIRS); printf("\n");
-    free_moveList(moveList, PAWN_DIRS);
+    print_moves(moveList, SPEC_DIRS); printf("\n");
+    free_moveList(moveList, SPEC_DIRS);
 
     //print_moves(moveList, PAWN_DIRS);printf("\n");
 
-    move(b, c, t, pos_1, pos_1 + N);
+    move(b, c, t, pos_1, pos_1 + 3 * N);
     print_board(b);
     
-    moveList = pawn_move_range(b, c, pos_1 + N);
-    print_moves(moveList, PAWN_DIRS);printf("\n");
-    free_moveList(moveList, PAWN_DIRS);
+    moveList = queen_move_range(b, c, pos_1 + 3 * N);
+    print_moves(moveList, SPEC_DIRS);printf("\n");
+    free_moveList(moveList, SPEC_DIRS);
 
     
 

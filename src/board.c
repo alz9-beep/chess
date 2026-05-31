@@ -54,8 +54,8 @@ void print_board(board *b){
             else if(*black_mask & MSB){ buf[j] = 2; }
             else { buf[j] = 0 ; }
            
-            m_shift(white_mask, 1, LEFT);
-            m_shift(black_mask, 1, LEFT);
+            white = m_shift(white, 1, LEFT);
+            black = m_shift(black, 1, LEFT);
 
         }
         print_buf(bufp);
@@ -69,26 +69,14 @@ void print_buf(int *bp){
     printf("\n");
 }
 
-uint64_t colorMask(board * b, piece_c color){
+uint64_t colorMask(board *b, piece_c color) {
+    assert(color == WHITE || color == BLACK);
     
-    uint64_t ret = 0;
-   
-    switch(color){
-        case WHITE:
-            for(int i = PAWN; i <= KING; i++){
-                ret |= b->white[i];
-            }
-            break;
-        case BLACK:
-            for(int i = PAWN; i <= KING; i++){
-                ret |= b->black[i];
-            }
-            break;
-    }
-   
-    return ret;
-        
+    uint64_t *pieces = (color == WHITE) ? b->white : b->black;
+    return pieces[PAWN] | pieces[KNIGHT] | pieces[BISHOP] | 
+           pieces[ROOK] | pieces[QUEEN]  | pieces[KING];
 }
+
 
 piece_t piece_in_pos(uint64_t *p, int pos){ //takes b->white/black arr as argument
     for(piece_t i = PAWN; i <= KING; i++){
