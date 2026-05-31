@@ -12,7 +12,10 @@ int main(){
     
     int pos_1 = get_position(b,c,t, 1);   
     int pos_2 = get_position(b, c, t, 2);
-    printf("pos_1: %d, pos_2: %d\n", pos_1, pos_2);
+    printf("white : pos_1: %d, pos_2: %d\n", pos_1, pos_2);
+
+    int pos_3 = get_position(b, !c, t, 1);
+    int pos_4,
     
     //if(move(b, c, t, pos_1, 48)){printf("piece taken\n");} else{printf("no piece there\n");}
 
@@ -25,8 +28,19 @@ int main(){
     printf(" pos_1: %d, pos_2: %d\n", pos_1, pos_2);*/
     
 
-    print_moves(moveList, PAWN_DIRS);
+    print_moves(moveList, PAWN_DIRS); printf("\n");
     free_moveList(moveList, PAWN_DIRS);
+
+    //print_moves(moveList, PAWN_DIRS);printf("\n");
+
+    move(b, c, t, pos_1, pos_1 + N);
+    print_board(b);
+    
+    moveList = pawn_move_range(b, c, pos_1 + N);
+    print_moves(moveList, PAWN_DIRS);printf("\n");
+    free_moveList(moveList, PAWN_DIRS);
+
+    
 
     free_board(b);
 

@@ -55,6 +55,15 @@ int in_bounds(int pos, int dir){
 
 }
 
+int first_pawn_move(int pos, piece_c color){
+
+     if(color == BLACK){
+         pos -= 40;
+     }
+     if(pos > 7 && pos < 16){ return 1; }
+     return 0;
+}
+
 void print_moves(link **arr, int dirs){
     for(int i = 0; i < dirs; i++){
         print_links(arr[i]);

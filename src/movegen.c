@@ -25,6 +25,7 @@ void free_moveList(link **arr, int num_dirs){
         free_link(arr[i]);
     }
     free(arr);
+    arr = NULL;
 }
 
 link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max){
@@ -59,7 +60,7 @@ link *range(uint64_t ally_mask, uint64_t enemy_mask, int pos, int dir, int max){
        m_shift(enemy, dir, direction); 
 
 
-       if (!in_bounds(pos, dir)){ 
+       if (!in_bounds(pos, dir)){
            //printf("out of bounds\n");
            return head; 
        }
@@ -117,13 +118,22 @@ link **pawn_move_range(board *b, piece_c color, int pos){
 
     link **movelist = create_moveList(PAWN_DIRS);
 
-    for(int i = 0; i < PAWN_DIRS; i++){
-        movelist[i] = range(ally_mask, enemy_mask, pos, directions[i], 2);
+    int i = 0;
+
+    if(first_pawn_move(pos, color)){
+        movelist[i] = range(ally_mask, enemy_mask, pos, directions[i], 2); 
+        i++;
+    }
+    
+    for(; i < PAWN_DIRS; i++){
+        
+        movelist[i] = range(ally_mask, enemy_mask, pos, directions[i], 1);
+        if(i){ trim_pawn_moves(&movelist[i], pos, enemy_mask, directions[i]); }
     }
     
     return movelist;
 }
-    
+
 link **knight_move_range(board * b, piece_c color, int pos){
     return NULL;
 }
@@ -194,4 +204,19 @@ int get_position(board *b, piece_c color, piece_t type, int n){
 
 }
 
+void trim_pawn_moves(link **moves, int pos, uint64_t enemy, int dir){
+    if (moves == NULL || *moves == NULL) return;
+    shift_dir sdir = (dir > 0) ? RIGHT: LEFT; 
+    uint64_t bit_check = (dir > 0) ? LSB: MSB;
+
+    uint64_t enemy_mask = enemy;
+    
+    m_shift (&enemy_mask, pos + dir, sdir);
+
+    if(!(enemy_mask & bit_check)){
+        free_link(*moves);
+        *moves = NULL;
+    }
+
+}
 

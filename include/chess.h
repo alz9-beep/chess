@@ -57,10 +57,12 @@ link **pawn_move_range(board *b, piece_c color, int pos);
 link **rook_move_range(board *b, piece_c color, int pos);
 link **bishop_move_range(board *b, piece_c color, int pos);
 int get_position(board *b, piece_c color, piece_t type, int n);
+void trim_pawn_moves(link **, int, uint64_t, int); //checks if diagonals are actual captures, trimming invalid
 
 // Prototypes: Utilities (utils.c)
 void m_shift(uint64_t *mask, int pos, shift_dir dir);
 int in_bounds(int pos, int dir);
+int first_pawn_move(int, piece_c);
 void pos_to_char(int pos);
 void print_moves(link **arr, int dirs);
 void print_links(link *head);
